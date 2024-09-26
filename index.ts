@@ -1,5 +1,5 @@
 import createError from 'http-errors';
-import express from "express"
+import express, {Request, Response} from "express"
 import morgan from "morgan"
 import {NearestStopsRouter} from "./src/routes/get-nearest-stops";
 import {PredictedScheduleRouter} from "./src/routes/get-predicted-schedule";
@@ -9,7 +9,7 @@ import "./dotenv-config";
 const app = express()
 const PORT = process.env.PORT || 3000;
 
-morgan.token('host', function(req) {
+morgan.token('host', function(req: Request) {
     return req.hostname;
 });
 
@@ -21,16 +21,13 @@ app.use(NearestStopsRouter)
 app.use(PredictedScheduleRouter)
 app.use(SubscriptionRouter)
 
-
 app.use(function (req, res, next) {
     next(createError(404));
 });
-app.use(function (err: any, req: any, res: any) {
 
-    console.log(err);
-    // set locals, only providing error in development
+app.use(function (err: any, req: Request, res: Response) {
     res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+    res.locals.error = process.env.DEBUG_ENVIRONMENT === 'development' ? err : {};
 
     res.status(err.status || 500);
     res.json(err)
