@@ -1,0 +1,127 @@
+<html lang="en">
+<head>
+    <title>demo</title>
+    <link rel="stylesheet" href="./main.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+</head>
+<body>
+<div id="map"></div>
+<div id="routes">
+
+</div>
+<script>
+    var data = "";
+    async function fetchData(func) {
+        try {
+            const response = await fetch('./output.json');
+            data = await response.json();
+
+            func();
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+        }
+    }
+
+</script>
+<script>
+    var map = L.map('map');
+
+    function init(map, zoom = 5) {
+        const WELLY_LAT = -41.2865;
+        const WELLY_LON = 174.7762;
+        const WELLY_LOCATION = [WELLY_LAT, WELLY_LON];
+
+        map.setView(WELLY_LOCATION, zoom);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+    }
+
+    function updateMap(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        console.log([lat, lng])
+
+
+        // Center the map on the user's location
+        map.setView([lat, lng], 18);
+
+        // Add a marker at the user's location
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup("You are here!")
+            .openPopup();
+
+        drawCloseStops()
+        drawRoutes();
+    }
+
+    function drawCloseStops() {
+        data.stops.forEach((stop) => {
+            L.marker([stop.stop_lat, stop.stop_lon]).addTo(map)
+                .bindPopup(`${stop.stop_name}`)
+                .openPopup();
+        });
+    }
+
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+            default:
+                alert("An unknown error occurred.");
+                break;
+        }
+    }
+
+    function initUserLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(updateMap, showError);
+
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function drawRoutes() {
+        let html = "<ul>";
+
+        Object.keys(data.routes).forEach(key => {
+            data.routes[key].forEach(function (route) {
+                html +=`<li>${route.route_long_name} ${route.route_short_name}</li>`
+            })
+        })
+
+        html += "</ul>";
+
+
+        console.log(html);
+        document.getElementById("routes").innerHTML = html;
+    }
+
+
+    (function () {
+        fetchData(function () {
+            init(map);
+            initUserLocation();
+        });
+    })();
+
+</script>
+</body>
+
+</html>
