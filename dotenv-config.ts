@@ -13,4 +13,12 @@ const checkEnvVariables = (variables: string[]): void => {
 };
 
 // Check for required environment variables
-checkEnvVariables(['PORT', 'METLINK_TOKEN']);
+checkEnvVariables([
+    'PORT',
+    'METLINK_TOKEN',
+    'MONGO_USERNAME',
+    'MONGO_PASSWORD',
+    'MONGO_DATABASE',
+    'MONGO_HOST',
+    'MONGO_PORT'
+]);

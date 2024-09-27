@@ -5,13 +5,17 @@ import {NearestStopsRouter} from "./src/routes/get-nearest-stops";
 import {PredictedScheduleRouter} from "./src/routes/get-predicted-schedule";
 import {SubscriptionRouter} from "./src/routes/get-subscription";
 import "./dotenv-config";
+import {connectWithEnvironmentVars} from "./src/mongoose";
 
 const app = express()
 const PORT = process.env.PORT || 3000;
 
-morgan.token('host', function(req: Request) {
+morgan.token('host', function (req: Request) {
     return req.hostname;
 });
+
+connectWithEnvironmentVars()
+    .then(r => console.log(r));
 
 app.use(express.json());
 app.use(morgan('tiny'))
