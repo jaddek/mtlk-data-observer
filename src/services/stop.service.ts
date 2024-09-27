@@ -22,7 +22,8 @@ const getStopsInDistance = async (
 const saveStops = async (stops: []) => {
     return await StopModel.insertMany(stops.map(function (stop: any) {
             return new StopModel({
-                id: stop.id,
+                metlinkId: stop.id,
+                stopId: stop.stop_id,
                 code: stop.stop_code,
                 name: stop.stop_name,
                 description: stop.stop_descr,
@@ -52,6 +53,22 @@ const findAllStops = async () => {
     return [];
 }
 
+const findStopByMetlinkId = async (metlinkStopId: number): Promise<any> => {
+    return StopModel.findOne({metlinkId: metlinkStopId});
+}
+
+async function updateStopRoutesByMetlinkCode(metlinkStopCode: string, routes: Number[]): Promise<StopInterface | null> {
+    return StopModel.findOneAndUpdate(
+        {code: metlinkStopCode},
+        {routes: routes},
+        {
+            new: true,
+            runValidators: true,
+        }
+    ).populate('routes');
+}
+
+
 const findStopsWithinDistance = async (
     shape: Shape
 ) => {
@@ -69,7 +86,7 @@ const findStopsWithinDistance = async (
         });
     } catch (error) {
         if (error instanceof MongooseError) {
-            throw new Error('Error retrieving locations: ' + error.message);
+            throw new Error('Error retrieving stops by location: ' + error.message);
         }
     }
 
@@ -80,5 +97,7 @@ export {
     getStopsInDistance,
     saveStops,
     findAllStops,
-    findStopsWithinDistance
+    findStopsWithinDistance,
+    findStopByMetlinkId,
+    updateStopRoutesByMetlinkCode,
 }

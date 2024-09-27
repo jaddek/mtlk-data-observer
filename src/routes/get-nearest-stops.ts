@@ -1,22 +1,23 @@
 import express, {Request, Response} from 'express';
-import {query, validationResult} from 'express-validator';
-import {findStopsWithinDistance} from "../services/stop.service";
+import {param, query, validationResult} from 'express-validator';
+import {findStopsWithinDistance, updateStopRoutesByMetlinkCode} from "../services/stop.service";
 import {ParsedQs} from "qs";
 import {Shape} from "../contracts";
 import {StopInterface} from "../models/stop.model";
+import {getRoutesFromSourceOfTruth} from "../services/metlink.service";
+import {findRoutesByIds} from "../services/route.service";
+import {RouteInterface} from "../models/route.model";
 
-const getParams = (query: ParsedQs) => {
+const getParams = (query: ParsedQs): Shape => {
     const coords: string = query.coords?.toString()!;
     const [lat, lon] = coords.split(",");
     const distance: number = parseInt(query.distance?.toString()!);
 
-    const shape: Shape = {
+    return {
         lat: parseFloat(lat),
         lon: parseFloat(lon),
         distance: distance
-    }
-
-    return shape;
+    };
 }
 
 const router = express.Router();
@@ -35,5 +36,17 @@ router.get('/stops', [
 
     return res.json(stops);
 })
+
+
+router.get('/stops/:stopId/routes', [
+    param('stopId').isInt().notEmpty(),
+], async (req: Request, res: Response) => {
+    const metlinkRoutes = await getRoutesFromSourceOfTruth(req.params.stopId)
+    const routes = await findRoutesByIds(metlinkRoutes.map((metlinkRoute: { id: number }) => metlinkRoute.id));
+    const stop = await updateStopRoutesByMetlinkCode(req.params.stopId, routes.map((route: RouteInterface) => route.id));
+
+    return res.json(stop);
+})
+
 
 export {router as NearestStopsRouter};

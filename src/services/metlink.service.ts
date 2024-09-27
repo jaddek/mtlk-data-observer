@@ -8,9 +8,11 @@ export async function getStopsFromSourceOfTruth(): Promise<[]> {
     return response.data;
 }
 
-export async function getRoutesFromSourceOfTruth(): Promise<[]> {
+export async function getRoutesFromSourceOfTruth(
+    stopId: string | null = null
+): Promise<[]> {
     const client = <MetlinkHttpClient>getMetlinkHttpClient();
-    const response = await client.getGtfsRoutes();
+    const response = await client.getGtfsRoutes(stopId);
 
     return response.data;
 }

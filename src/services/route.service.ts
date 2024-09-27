@@ -33,7 +33,12 @@ const findAllRoutes = async () => {
     return [];
 }
 
+const findRoutesByIds = async (routeIds: number[]) => {
+    return RouteModel.find({metlinkId: {$in: routeIds}})
+}
+
 export {
     findAllRoutes,
+    findRoutesByIds,
     saveRoutes
 }

@@ -1,8 +1,8 @@
 import mongoose, {Document, Schema} from 'mongoose';
 
 export interface StopInterface extends Document {
-    id: number;
     metlinkId: number;
+    stopId: string;
     code: string
     name: string;
     description: string,
@@ -17,11 +17,12 @@ export interface StopInterface extends Document {
     parentStation: string;
     stopUrl: string;
     stopTimeZone: string;
+    routes: [number];
 }
 
 const StopSchema: Schema<StopInterface> = new mongoose.Schema({
-    id: {type: Number, required: true, unique: true,},
     metlinkId: {type: Number, required: true, unique: true,},
+    stopId: {type: String, required: true, unique: true,},
     code: {type: String, required: true},
     name: {type: String, required: true},
     description: {type: String, required: false},
@@ -42,7 +43,8 @@ const StopSchema: Schema<StopInterface> = new mongoose.Schema({
     locationType: {type: Number, required: false},
     parentStation: {type: String, required: false},
     stopUrl: {type: String, required: false},
-    stopTimeZone: {type: String, required: false}
+    stopTimeZone: {type: String, required: false},
+    routes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Route'}]
 });
 
 StopSchema.index({location: '2dsphere'});

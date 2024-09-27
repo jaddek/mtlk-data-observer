@@ -10,8 +10,7 @@ router.get('/subscription/vehicle/:vehicleId', (req: Request, res: Response) => 
 })
 
 router.get('/subscription/stop/:stopId', (req: Request, res: Response) => {
-
-    return res.json([]);
+    return res.json(req.params);
 })
 
 export {router as SubscriptionRouter};
