@@ -7,4 +7,3 @@ export async function MetlinkStopsImport(): Promise<any>
 
     return await saveStops(stops);
 }
-

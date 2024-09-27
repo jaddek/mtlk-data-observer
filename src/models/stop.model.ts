@@ -2,6 +2,7 @@ import mongoose, {Document, Schema} from 'mongoose';
 
 export interface StopInterface extends Document {
     id: number;
+    metlinkId: number;
     code: string
     name: string;
     description: string,
@@ -20,6 +21,7 @@ export interface StopInterface extends Document {
 
 const StopSchema: Schema<StopInterface> = new mongoose.Schema({
     id: {type: Number, required: true, unique: true,},
+    metlinkId: {type: Number, required: true, unique: true,},
     code: {type: String, required: true},
     name: {type: String, required: true},
     description: {type: String, required: false},

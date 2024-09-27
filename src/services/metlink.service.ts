@@ -7,3 +7,10 @@ export async function getStopsFromSourceOfTruth(): Promise<[]> {
 
     return response.data;
 }
+
+export async function getRoutesFromSourceOfTruth(): Promise<[]> {
+    const client = <MetlinkHttpClient>getMetlinkHttpClient();
+    const response = await client.getGtfsRoutes();
+
+    return response.data;
+}
